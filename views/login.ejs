@@ -1,0 +1,68 @@
+<%- include('partials/header.ejs') %>
+<div class="container-md" data-bs-theme="dark" style="height: 100vh;">
+    <div class="row justify-content-center pt-3 mt-3" style="height: inherit;">
+        <div class="col-12 col-lg-6">
+            <h1 class="text-center mb-5">Admin</h1>
+            <div style="display: none;" class="mb-3" id="error-div">
+                <div class="alert border border-danger justify-content-center text-center" role="alert">
+                    <b><p style="margin: 0; padding: 0;">Login inválido!</p></b> <br>
+                    <b><p style="margin: 0; padding: 0;">Verifique suas credenciais ou contate um administrador.</p></b>
+                </div>
+            </div>
+            <div class="card shadow-lg">
+                <div class="card-body shadow-lg">
+                    <div class="d-flex justify-content-center">
+                        <img src="/imgs/logo.png" class="mx-auto shadow-lg"  height="90">
+                    </div>
+                    <form id="login-form" method="post">
+                        <input type="hidden" name="next" value="">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" aria-describedby="emailHelp" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="btn btn-success mt-3 px-3">Log In</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<%- include('partials/footer.ejs') %>
+
+<script>
+    const form = document.querySelector("#login-form");
+    function encode(username, password) {
+        return btoa(`${username}:${password}`);
+    }
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const username = document.querySelector("#username").value;
+        const password = document.querySelector("#password").value;
+
+        let authorizationData = `Basic ${encode(username, password)}`;
+
+        fetch('http://localhost:8080/api/login', {
+            method: "POST",
+            headers: {Authorization: authorizationData}
+        })
+            .then(response => response.json())
+            .then(response => {
+                if (response.status === "200") {
+                    window.localStorage.setItem("Authorization", authorizationData);
+                    window.localStorage.setItem("Authenticated", true);
+                    window.location.href = "/admin";
+                } else {
+                    const errorDiv = document.querySelector("#error-div");
+                    errorDiv.style.display = "block";
+                }
+            })
+            .catch(err => console.log(err));
+    })
+</script>

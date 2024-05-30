@@ -1,0 +1,75 @@
+<%- include('partials/header.ejs') %>
+<div>
+      <div class="container my-5">
+        <div class="row">
+            <form class="d-flex justify-content-center" id="form-panel-stats" method="get">
+                <input id="panelId" type="hidden" value="<% if (locals.data) { %> <%= data.id %> <% } %>" name="panelId">
+                <input class="form-control me-2 form-guess" style="width: 300px;" id="panelKwh" type="number" min="1" name="panelKwh" placeholder="Digite o consumo em kWh..." required>
+                <button class="btn btn-success btn-guess" type="submit">Pesquisar</button>
+            </form>
+            <div class="d-flex justify-content-center mt-3">
+                <small>Digite seu consumo mensal em kWh para verificar as estatísticas do painel.</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container" style="min-height: 80vh;">
+        <% if (locals.data) { %>
+            <div class="row">
+                <div class="col-lg-6">
+                    <img src="http://localhost:8080/api/panels/<%= data.id %>/foto" class="img-fluid">
+                </div>
+                <div class="col-lg-6">
+                    <div class="border-bottom my-4">
+                        <h3>Painel Solar <%= data.brand %> <%= data.model %></h3>
+                        <h5><span class="text-success">Potência máxima:</span> <%= data.maximumPower %>W</h5>
+                        <h5><span class="text-success">Eficiência:</span> <%= data.efficiency %>%</h5>
+                        <h5><span class="text-success">Tipo:</span> <%= data.panelType %></h5>
+                        <div class="py-2">
+                            <h4><strong class="text-success">R$<%= data.price %></strong></h4>
+                        </div>
+                    </div>
+                    <div id="stats-div">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <h6>gráfico aq</h6>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+<script>
+    document.getElementById('form-panel-stats').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const panelId = parseInt(document.getElementById('panelId').value);
+        const kwh = document.getElementById("panelKwh").value;
+
+        const options = {method: 'GET', headers: {'Content-Type': 'application/json'}};
+        const url = `http://localhost:8080/api/panels/${panelId}/stats?kwh=${parseInt(kwh)}`;
+
+        fetch(url, options)
+        .then(response => response.json())
+        .then(response => {
+            const statsDiv = document.querySelector("#stats-div");
+            statsDiv.innerHTML = "";
+            
+            let estimatedPriceH6 = document.createElement("h5");
+            estimatedPriceH6.innerHTML = `<span class="text-success">Preço Estimado:</span> ${response.stats.estimatedPrice} R$`;
+
+            let panelsNeededH6 = document.createElement("h5");
+            panelsNeededH6.innerHTML = `<span class="text-success">Paineis Necessários:</span> ${response.stats.panelsNedeed} unidades`
+
+            let returnOfInvestmentH6 = document.createElement("h5");
+            returnOfInvestmentH6.innerHTML = `<span class="text-success">Retorno de Investimento:</span> ${response.stats.returnOfInvestment} anos`
+
+            statsDiv.append(estimatedPriceH6, panelsNeededH6, returnOfInvestmentH6);
+        })
+        .catch(err => console.error(err));
+
+    });
+</script>
+<%- include('partials/footer.ejs') %>

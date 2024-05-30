@@ -1,0 +1,115 @@
+<%- include('partials/header.ejs') %>
+<section style="height: 100vh;">
+    <div class="container-md" style="height: 100%;">
+        <div class="row align-items-center" style="height: 100%;">
+            <div class="col d-flex justify-content-center">
+                <div class="card shadow-lg">
+                    <div class="card-body shadow-lg">
+                        <h5 class="card-title text-center text-success mb-3"><b>Salvar um novo Painel Solar</b></h5>
+                        <form id="add-panel-form" method="post">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="sp-brand" placeholder="name@example.com" required>
+                                <label for="sp-brand">Marca do Painel Solar</label>
+                              </div>
+                              <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="sp-model" placeholder="aaaaaa" required>
+                                <label for="sp-model">Modelo do Painel Solar</label>
+                              </div>
+                              <div class="form-floating mb-3">
+                                <input type="number" min="1" class="form-control" id="sp-max-power" placeholder="Password" required>
+                                <label for="sp-max-power">Poder Máximo do Painel Solar (W)</label>
+                              </div>
+                              <div class="form-floating mb-3">
+                                <input type="number" min="1" max="100" class="form-control" id="sp-efficiency" placeholder="Password" required>
+                                <label for="sp-efficiency">Eficiência do Painel Solar (%)</label>
+                              </div>
+                              <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="sp-panel-type" placeholder="Password" required>
+                                <label for="sp-panel-type">Tipo do Painel Solar</label>
+                              </div>
+                              <div class="form-floating mb-3">
+                                <input type="number" min="1" step="any" class="form-control" id="sp-price" placeholder="Password" required>
+                                <label for="sp-price">Preço do Painel Solar</label>
+                              </div>
+                              <div class="form-floating mb-3">
+                                  <input class="form-control" type="file" id="formFile">
+                                  <label for="formFile" class="form-label">Imagem do Painel Solar</label>
+                              </div>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-success mt-3 px-3">Enviar Painel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<%- include('partials/footer.ejs') %>
+
+<script>
+    if (!window.localStorage.getItem("Authorization")) {
+        window.location.href = "/admin/login";
+    }
+    const addPanelForm = document.querySelector("#add-panel-form");
+    addPanelForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const authorizationData = window.localStorage.getItem("Authorization");
+        const formData = new FormData();
+
+        const spBrand = document.querySelector("#sp-brand").value;
+        const spModel = document.querySelector("#sp-model").value;
+        const spMaxPower = document.querySelector("#sp-max-power").value;
+        const spEfficiency = document.querySelector("#sp-efficiency").value;
+        const spType = document.querySelector("#sp-panel-type").value;
+        const spPrice = document.querySelector("#sp-price").value;
+        const file = document.querySelector("#formFile");
+
+        const bodyData = JSON.stringify({
+            brand: spBrand,
+            model: spModel,
+            maximumPower: parseInt(spMaxPower),
+            efficiency: parseInt(spEfficiency),
+            panelType: spType,
+            price: parseFloat(spPrice)
+        });
+
+    
+        formData.append("arquivo", file.files[0]);
+        formData.append("model", spModel);
+        formData.append("brand", spBrand);
+        formData.append("maximumPower", parseInt(spMaxPower));
+        formData.append("efficiency", parseInt(spEfficiency));
+        formData.append("panelType", spType);
+        formData.append("price", parseFloat(spPrice));
+
+        let url = 'http://localhost:8080/api/panels/with-image';
+
+        let options = {
+            method: 'POST',
+            headers: {
+                Authorization: authorizationData, 
+            },
+            body: formData
+        };
+
+        console.log(bodyData);
+
+        fetch(url, options)
+        .then(res => {
+            console.log(res);
+            return res.json();
+        })
+        .then(data => {
+            if (data.id) {
+                console.log(data);
+                window.location.href = `/panels/${data.id}`;
+            } else {
+                console.log(data);
+            }
+        })
+        .catch(err => console.error('error:' + err));
+
+    })
+</script>

@@ -1,0 +1,49 @@
+<%- include('partials/header.ejs') %>
+<div id="is-authenticated" style="display: none;">
+</div>
+<div class="container-fluid mx-auto d-flex justify-content-center my-5"></div>
+
+  <div class="container">
+    <div class="container-fluid d-flex justify-content-center my-5">
+      <img src="/imgs/paineis.png" alt="Paineis Banner" style="width: 1200px; height: 400px;">
+    </div>
+
+    <div class="container-fluid d-flex flex-wrap my-5">
+      <div class="my-3">
+        <h4 class="text-success">ODS 7</h4>
+      </div>
+
+      <div class="d-flex gap-4">
+        <img src="/imgs/ODS7.jpg" alt="ODS 7 Logo" width="250">
+        <p>
+          O Objetivo de Desenvolvimento Sustentável (ODS) 7 visa "garantir o acesso confiável, sustentável, 
+          moderno e a preço acessível à energia para todos". Este objetivo é parte da Agenda 2030 da ONU e se 
+          concentra em assegurar que todas as pessoas tenham acesso a serviços de energia que sejam seguros, 
+          eficientes e que contribuam para o desenvolvimento sustentável.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid mx-0 px-0">
+    <div class="container-fluid d-flex py-5 px-5" style="background-color: rgb(160, 160, 160);">
+
+      <div class="container d-flex flex-column align-items-center py-5 px-5">
+        <div class="my-3 mx-5">
+          <h4 class="text-black">Utilização eficiente da energia</h4>
+        </div>
+
+        <div class="d-flex gap-4 mx-5">
+          <p class="text-left text-light">
+            O uso eficiente da energia é uma das maneiras mais eficazes de reduzir custos operacionais, 
+            diminuir a pegada de carbono e preservar os recursos naturais.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>  
+<%- include('partials/footer.ejs') %>
+
+<script>
+  window.localStorage.setItem("Authenticated", false);
+</script>
