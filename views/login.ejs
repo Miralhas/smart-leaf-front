@@ -57,7 +57,7 @@
                 if (response.status === "200") {
                     window.localStorage.setItem("Authorization", authorizationData);
                     window.localStorage.setItem("Authenticated", true);
-                    window.location.href = "/admin";
+                    window.location.href = "/";
                 } else {
                     const errorDiv = document.querySelector("#error-div");
                     errorDiv.style.display = "block";

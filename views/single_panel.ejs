@@ -15,7 +15,38 @@
     
     <div class="container" style="min-height: 80vh;">
         <% if (locals.data) { %>
-            <div class="row">
+            <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="exampleChartModal" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5 text-center" id="exampleChartModal">Gráficos</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-center">
+                            <div class="line-chart-div" style="width:800px">
+                                <canvas id="canvas-line-chart">
+        
+                                </canvas>
+                            </div>
+                        </div>
+                        <div class="border border-success my-4"></div>
+                        <div class="d-flex justify-content-center">
+                            <div class="bar-chart-div" style="width:800px">
+                                <canvas id="canvas-bar-chart">
+        
+                                </canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                      <button type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <div class="row" id="solar-panel-div">
                 <div class="col-lg-6">
                     <img src="http://localhost:8080/api/panels/<%= data.id %>/foto" class="img-fluid">
                 </div>
@@ -34,14 +65,10 @@
                     </div>
                 </div>
             </div>
-            <div class="row mt-3">
-                <div class="col">
-                    <h6>gráfico aq</h6>
-                </div>
-            </div>
         <% } %>
     </div>
 </div>
+<script src="/chart.js/chart.umd.js"></script>
 <script>
     document.getElementById('form-panel-stats').addEventListener('submit', function(event) {
         event.preventDefault();
@@ -52,24 +79,187 @@
         const url = `http://localhost:8080/api/panels/${panelId}/stats?kwh=${parseInt(kwh)}`;
 
         fetch(url, options)
-        .then(response => response.json())
         .then(response => {
+            return response.json().then(data => ({data, status: response.status}));
+        })
+        .then(({data, status}) => {
             const statsDiv = document.querySelector("#stats-div");
             statsDiv.innerHTML = "";
             
             let estimatedPriceH6 = document.createElement("h5");
-            estimatedPriceH6.innerHTML = `<span class="text-success">Preço Estimado:</span> ${response.stats.estimatedPrice} R$`;
+            estimatedPriceH6.innerHTML = `<span class="text-success">Preço Estimado:</span> ${data.stats.estimatedPrice} R$`;
 
             let panelsNeededH6 = document.createElement("h5");
-            panelsNeededH6.innerHTML = `<span class="text-success">Paineis Necessários:</span> ${response.stats.panelsNedeed} unidades`
+            panelsNeededH6.innerHTML = `<span class="text-success">Paineis Necessários:</span> ${data.stats.panelsNedeed} unidades`
 
             let returnOfInvestmentH6 = document.createElement("h5");
-            returnOfInvestmentH6.innerHTML = `<span class="text-success">Retorno de Investimento:</span> ${response.stats.returnOfInvestment} anos`
+            returnOfInvestmentH6.innerHTML = `<span class="text-success">Retorno de Investimento:</span> ${data.stats.returnOfInvestment} anos`
 
-            statsDiv.append(estimatedPriceH6, panelsNeededH6, returnOfInvestmentH6);
+            let chartBtn = document.createElement("button");
+            chartBtn.classList.add("btn", "btn-outline-success", "mt-3")
+            chartBtn.setAttribute("data-bs-toggle", "modal");
+            chartBtn.setAttribute("data-bs-target", "#chartModal");
+            chartBtn.innerHTML = "Ver Gráficos";
+
+            statsDiv.append(panelsNeededH6, estimatedPriceH6, returnOfInvestmentH6, chartBtn);
+
+            returnOfInvestmentChartGenerator(data, kwh);
+            barChartGenerator(data, kwh);
+    
         })
         .catch(err => console.error(err));
-
     });
+
+    function returnOfInvestmentChartGenerator(solarPanelData, kwh) {
+
+        const returnOfInvestment = Math.round(solarPanelData.stats.returnOfInvestment);
+
+        const painelKwhDiario = solarPanelData.stats.panelsNedeed * (solarPanelData.maximumPower / 1000) * 6
+        const painelKwhAnual = (painelKwhDiario * 30) * 12;
+
+        const custoAnualSemPainelSolar = (kwh * 0.68) * 12;
+        const custoAnualComPainelSolar = painelKwhAnual * 0.68
+
+        const chartData = [
+            {title: "0 Ano", count: {comPainel: 0, semPainel: 0}},
+            {title: "1 Ano", count: {comPainel: -4000, semPainel: -custoAnualSemPainelSolar}},
+            {title: "2 Ano", count: {comPainel: -3000, semPainel: -(custoAnualSemPainelSolar * 2)}},
+            {title: "3 Ano", count: {comPainel: -2000, semPainel: -(custoAnualSemPainelSolar * 3)}},
+            {title: "4 Ano", count: {comPainel: -1000, semPainel: -(custoAnualSemPainelSolar * 4)}},
+            {title: "5 Ano", count: {comPainel: -100, semPainel: -(custoAnualSemPainelSolar * 5)}},
+            {title: "6 Ano", count: {comPainel: -100, semPainel: -(custoAnualSemPainelSolar * 6)}},
+            {title: "7 Ano", count: {comPainel: -100, semPainel: -(custoAnualSemPainelSolar * 7)}},
+            {title: "8 Ano", count: {comPainel: -100, semPainel: -(custoAnualSemPainelSolar * 8)}},
+        ];
+
+        const redRGB = 'rgba(255, 99, 71, 0.5)';
+        const greenRGB = 'rgba(0, 213, 0, 0.5)';
+        const whiteRGB = "rgb(255,255,255)"
+
+        const xySettings = {ticks: {color: whiteRGB, font: {size: 14},beginAtZero: true}}
+
+        const formattedData = {
+            labels: chartData.map(row => row.title),
+            datasets: [
+                {
+                    label: "Com Painel Solar",
+                    data: chartData.map(row => row.count.comPainel),
+                    backgroundColor: greenRGB,
+                    borderColor: greenRGB,
+                    yAxisId: 'y'
+                },
+                {
+                    label: "Sem Painel Solar",
+                    data: chartData.map(row => row.count.semPainel),
+                    backgroundColor: redRGB,
+                    borderColor: redRGB,
+                    yAxisId: 'y1'
+                }  
+        ]
+        };
+
+        new Chart(document.querySelector("#canvas-line-chart"), {
+            type: 'line',
+            data: formattedData,
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                stacked: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: whiteRGB,
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: "Chart.js Line Chart - Multi Axis"
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {color: whiteRGB, font: {size: 14}},
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                    },
+                    y1: {
+                        ticks: {color: whiteRGB, font: {size: 14}},
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    },
+                    x: xySettings
+                }
+            }
+        });
+    }
+
+    function barChartGenerator(solarPanelData, kwh) {
+
+        const returnOfInvestment = Math.round(solarPanelData.stats.returnOfInvestment);
+
+        const painelKwhDiario = solarPanelData.stats.panelsNedeed * (solarPanelData.maximumPower / 1000) * 6
+        const painelKwhAnual = (painelKwhDiario * 30) * 12;
+
+        const custoAnualSemPainelSolar = (kwh * 0.68) * 12;
+        const custoAnualComPainelSolar = painelKwhAnual * 0.68
+
+        console.log(custoAnualSemPainelSolar*10);
+        console.log(custoAnualComPainelSolar*returnOfInvestment)
+
+        const redRGB = 'rgba(255, 99, 71, 0.5)';
+        const greenRGB = 'rgba(0, 213, 0, 0.5)';
+        const whiteRGB = "rgb(255,255,255)"
+
+        const xySettings = {ticks: {color: whiteRGB, font: {size: 14}, beginAtZero: true}}
+
+        const chartData = [
+            {title: "Total com Painel Solar", value: custoAnualComPainelSolar*returnOfInvestment},
+            {title: "Total sem Painel Solar", value: custoAnualSemPainelSolar*10},
+        ]
+
+        const formattedData = {
+            labels: chartData.map(row => row.title),
+            datasets: [{
+                label: 'Renda Total após 10 anos de instalação', 
+                data: chartData.map(row => row.value),
+                backgroundColor: [greenRGB, redRGB],
+                borderColor: [greenRGB, redRGB],
+                borderWidth: 1
+            }]
+        }
+
+        new Chart(document.querySelector("#canvas-bar-chart"), {
+            type: 'bar',
+            data: formattedData,
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: whiteRGB,
+                            font: {
+                                size: 18
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: xySettings,
+                    x: xySettings
+                }
+            }
+        });
+    }
 </script>
+
 <%- include('partials/footer.ejs') %>

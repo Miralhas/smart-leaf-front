@@ -5,8 +5,11 @@ import bodyParser from "body-parser"
 const port = 3000
 const app = express();
 
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
+app.use('/chart.js', express.static("node_modules/chart.js/dist"));
+
 
 app.get("/", async (req, res) => {
     res.render("index.ejs")
@@ -16,7 +19,6 @@ app.get("/", async (req, res) => {
 app.get("/admin/login", async (req, res) => {
     res.render("login.ejs")
 }) 
-
 
 
 app.get("/add-panel", async (req, res) => {
