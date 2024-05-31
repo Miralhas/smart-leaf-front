@@ -19,11 +19,16 @@
           </a>
     
           <ul class="nav nav-pills d-flex align-items-center">
-            <li class="nav-item" id="add-panel-li" style="display: none;"><a href="/add-panel" class="nav-link text-success">Adicionar Painel</a></li>
             <li class="nav-item"><a href="/" class="nav-link text-success" aria-current="page">Home</a></li>
             <li class="nav-item"><a href="/panels" class="nav-link text-success">Paineis</a></li>
             <li class="nav-item"><a href="/sobre" class="nav-link text-success">Sobre</a></li>
-            <li class="nav-item" style="display: none;" id="logout-li"><a href="#" class="nav-link text-success">Logout</a></li>
+            <li class="nav-item dropdown" id="admin-dropdown" style="display: none;">
+              <button class="btn btn-dark dropdown-toggle text-success" data-bs-toggle="dropdown" aria-expanded="false">Admin</button>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li class="nav-item" id="add-panel-li"><a href="/add-panel" class="text-success dropdown-item">Adicionar Painel</a></li>
+                <li class="nav-item" id="logout-li"><a href="#" class="text-success dropdown-item">Logout</a></li>
+              </ul>
+            </li>
           </ul>
         </header>
       </div>

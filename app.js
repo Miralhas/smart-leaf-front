@@ -11,6 +11,7 @@ app.use(express.static("public"));
 app.use('/chart.js', express.static("node_modules/chart.js/dist"));
 app.use('/bootstrap', express.static("node_modules/bootstrap"));
 app.use('/fontawesome', express.static("node_modules/@fortawesome/fontawesome-free"));
+app.use('/popper', express.static("node_modules/@popperjs/core/dist/umd"));
 
 
 app.get("/", async (req, res) => {

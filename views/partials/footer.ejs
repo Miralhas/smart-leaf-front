@@ -19,17 +19,19 @@
       <!-- Footer start -->
 
 </body>
+    <script src="/popper/popper.js"></script>
     <script src="/bootstrap/dist/js/bootstrap.js"></script>
     <script>
-        const addPanel = document.querySelector("#add-panel-li");
         const logout = document.querySelector("#logout-li");
+        const adminDropdown = document.querySelector("#admin-dropdown");
         if (window.localStorage.getItem("Authorization")) {
-            addPanel.style.display = "block";
-            logout.style.display = "block";
+            adminDropdown.style.display = "block";
+
+            logout.addEventListener("click", () => {
+                window.localStorage.clear();
+                location.reload();
+            })
         }
-        logout.addEventListener("click", () => {
-            window.localStorage.clear();
-            location.reload();
-        })
+
     </script>
 </html>
