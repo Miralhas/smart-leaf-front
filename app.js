@@ -9,6 +9,8 @@ const app = express();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 app.use('/chart.js', express.static("node_modules/chart.js/dist"));
+app.use('/bootstrap', express.static("node_modules/bootstrap"));
+app.use('/fontawesome', express.static("node_modules/@fortawesome/fontawesome-free"));
 
 
 app.get("/", async (req, res) => {

@@ -4,6 +4,11 @@
     font-family: "Poppins", sans-serif;  
 }
 
+@font-face {
+    font-family: ;
+    src: url();
+}
+
 .solar-panel-card-img {
     height: 250px;
     max-width: 230px;
