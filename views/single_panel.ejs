@@ -1,9 +1,10 @@
 <%- include('partials/header.ejs') %>
-<div>
+<!-- <div> -->
+<% if (locals.data) { %>
       <div class="container my-5">
         <div class="row">
             <form class="d-flex justify-content-center" id="form-panel-stats" method="get">
-                <input id="panelId" type="hidden" value="<% if (locals.data) { %> <%= data.id %> <% } %>" name="panelId">
+                <input id="panelId" type="hidden" value="<%= data.id %>" name="panelId">
                 <input class="form-control me-2 form-guess" style="width: 300px;" id="panelKwh" type="number" min="1" name="panelKwh" placeholder="Digite o consumo em kWh..." required>
                 <button class="btn btn-success btn-guess" type="submit">Pesquisar</button>
             </form>
@@ -14,7 +15,9 @@
     </div>
     
     <div class="container" style="min-height: 80vh;">
-        <% if (locals.data) { %>
+
+
+        <!-- MODAL DOS GRÁFICOS -->
             <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="exampleChartModal" aria-hidden="true">
                 <div class="modal-dialog modal-xl">
                   <div class="modal-content">
@@ -44,13 +47,134 @@
                     </div>
                   </div>
                 </div>
-              </div>
+            </div>
+        <!-- MODAL DOS GRÁFICOS -->
+
+        <!-- MODAL DE EDIT -->
+            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleChartModal" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-center" id="exampleChartModal">Editar Painel</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="card shadow-lg">
+                            <div class="card-body shadow-lg">
+                                <h5 class="card-title text-center text-success mb-3"><b>Editar Painel Solar</b></h5>
+                                <form id="edit-panel-form" method="post">
+                                    <div class="form-floating mb-3">
+                                        <input type="hidden" value="<%= data.id %>" id="sp-id">
+                                        <input type="text" class="form-control" id="sp-brand" value="<%= data.brand %>" placeholder="name@example.com" required>
+                                        <label for="sp-brand">Marca do Painel Solar</label>
+                                      </div>
+                                      <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="sp-model" value="<%= data.model %>" placeholder="aaaaaa" required>
+                                        <label for="sp-model">Modelo do Painel Solar</label>
+                                      </div>
+                                      <div class="form-floating mb-3">
+                                        <input type="number" min="1" class="form-control" id="sp-max-power" value="<%= data.maximumPower %>" placeholder="Password" required>
+                                        <label for="sp-max-power">Poder Máximo do Painel Solar (W)</label>
+                                      </div>
+                                      <div class="form-floating mb-3">
+                                        <input type="number" min="1" max="100" class="form-control" id="sp-efficiency" value="<%= data.efficiency %>" placeholder="Password" required>
+                                        <label for="sp-efficiency">Eficiência do Painel Solar (%)</label>
+                                      </div>
+                                      <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="sp-panel-type" value="<%= data.panelType %>" placeholder="Password" required>
+                                        <label for="sp-panel-type">Tipo do Painel Solar</label>
+                                      </div>
+                                      <div class="form-floating mb-3">
+                                        <input type="number" min="1" step="any" class="form-control" id="sp-price" value="<%= data.price %>" placeholder="Password" required>
+                                        <label for="sp-price">Preço do Painel Solar</label>
+                                      </div>
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-success mt-3 px-3" data-bs-dismiss="modal">Editar Painel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Retornar</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        <!-- MODAL DE EDIT -->
+
+        <!-- MODAL DE DELETE -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleChartModal" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-center" id="exampleChartModal">Editar Painel</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5 class="text-center">Realmente deseja apagar este painel solar?</h5>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" value="<%= data.id %>" id="confirm-delete-btn" class="btn btn-success mt-3 me-3 px-3" data-bs-dismiss="modal">Sim</button>
+                            <button type="submit" class="btn btn-danger mt-3 px-3" data-bs-dismiss="modal">Não</button>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Retornar</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+        <!-- MODAL DE DELETE -->
+
+        <!-- MODAL DE EDITAR IMAGEM -->
+            <div class="modal fade" id="editImage" tabindex="-1" aria-labelledby="exampleChartModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header d-flex justify-content-center">
+                        <h1 class="fs-5 py-3">Alterar imagem do Painel Solar</h1>
+                    </div>
+                    <div id="body-foto-modal" class="modal-body">
+                        <div class="row border-bottom">
+                            <div class="col d-flex justify-content-center">
+                                <p id="carregar-foto" class="text-primary" style="cursor: pointer;">Carregar foto</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col d-flex justify-content-center">
+                                <span id="remover-foto" class="text-danger mt-3" style="cursor: pointer;">Remover foto atual</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="upload-nova-foto" class="modal-body" style="display: none;">
+                        <form method="post" id="nova-foto-form">
+                            <div class="form mb-3">
+                                <input type="hidden" value="<%= data.id %>" id="sp-id">
+                                <label for="formFile" class="form-label">Nova Imagem</label>
+                                <input class="form-control" type="file" id="formFile">
+                                <button type="submit" class="btn btn-sm btn-success mt-3 px-5">Enviar</button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="d-flex justify-content-center border-top">
+                        
+                        <p id="fechar-modal" class="text-light mt-3" style="cursor: pointer;" data-bs-dismiss="modal">Cancelar</p>
+                    </div>
+                </div>
+                </div>
+            </div>
+        <!-- MODAL DE EDITAR IMAGEM -->
+
             <div class="row" id="solar-panel-div">
-                <div class="col-lg-6">
-                    <img src="http://localhost:8080/api/panels/<%= data.id %>/foto" class="img-fluid">
+                <div class="col-lg-6 d-flex justify-content-center">
+                    <img id="panel-image" src="http://localhost:8080/api/panels/<%= data.id %>/foto" class="img-fluid" style="max-height: 636px;">
                 </div>
                 <div class="col-lg-6">
-                    <div class="border-bottom my-4">
+                    <div class="row my-3">
+                        <div class="col d-flex justify-content-md-end" id="edit-col">
+
+                        </div>
+                    </div>
+                    <div id="data-div" class="border-bottom mb-4">
                         <h3>Painel Solar <%= data.brand %> <%= data.model %></h3>
                         <h5><span class="text-success">Potência máxima:</span> <%= data.maximumPower %>W</h5>
                         <h5><span class="text-success">Eficiência:</span> <%= data.efficiency %>%</h5>
@@ -64,10 +188,198 @@
                     </div>
                 </div>
             </div>
-        <% } %>
+        </div>
+<%} else { %>
+    <div class="container" style="height: 50vh;">
+        <div class="row">
+            <div class="col text-center text-danger">
+                <h1><%= error.status %></h1>
+                <h3><%= error.detail %></h3>
+            </div>
+        </div>
     </div>
-</div>
+<% } %>
+<!-- </div> -->
 <script src="/chart.js/chart.umd.js"></script>
+
+<script>
+    if (window.localStorage.getItem("Authorization")) {
+        const editCol = document.querySelector("#edit-col");
+        const panelImage = document.querySelector("#panel-image");
+
+        const editBtn = document.createElement("button");
+        editBtn.classList.add("btn", "btn-sm", "btn-outline-primary", "me-2");
+        editBtn.setAttribute("data-bs-toggle", "modal");
+        editBtn.setAttribute("data-bs-target", "#editModal");
+        editBtn.innerHTML = "Editar Painel";
+        editBtn.id = "edit-btn";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.classList.add("btn", "btn-sm", "btn-outline-danger");
+        deleteBtn.setAttribute("data-bs-toggle", "modal");
+        deleteBtn.setAttribute("data-bs-target", "#deleteModal");
+        deleteBtn.innerHTML = "Apagar Painel";
+        deleteBtn.id = "delete-btn";
+
+        editCol.append(editBtn, deleteBtn);
+
+        const editImageAnchor = document.createElement("a");
+        editImageAnchor.setAttribute("data-bs-toggle", "modal");
+        editImageAnchor.setAttribute("data-bs-target", "#editImage");
+        editImageAnchor.setAttribute("href", "#");
+        deleteBtn.id = "edit-image-anchor";
+
+        panelImage.parentNode.insertBefore(editImageAnchor, panelImage);
+        editImageAnchor.appendChild(panelImage);
+    }
+</script>
+
+<script>
+    const confirmDeleteBtn = document.querySelector("#confirm-delete-btn");
+    confirmDeleteBtn.addEventListener('click', () => {
+        const authorizationData = window.localStorage.getItem("Authorization");
+
+        const options = {method: 'DELETE', headers: {Authorization: authorizationData}};
+        const panelId = confirmDeleteBtn.value;
+
+        fetch(`http://localhost:8080/api/panels/${panelId}`, options)
+        .then(response => {
+            window.location.href = "/panels";
+        })
+    })
+
+    const fotoModalBody = document.querySelector("#body-foto-modal");
+    const carregarFoto = document.querySelector("#carregar-foto");
+    const divUploadNovaFoto = document.querySelector("#upload-nova-foto");
+    const fecharModal = document.querySelector("#fechar-modal");
+    const panelImage = document.querySelector("#panel-image");
+    const removerFoto = document.querySelector("#remover-foto");
+
+    const authorizationData = window.localStorage.getItem("Authorization");
+    
+    fecharModal.addEventListener("click", () => {
+        fotoModalBody.style.display = "block";
+        divUploadNovaFoto.style.display = "none";
+    })
+
+
+    carregarFoto.addEventListener("click", () => {
+        fotoModalBody.style.display = "none";
+        divUploadNovaFoto.style.display = "block";
+
+        document.querySelector("#nova-foto-form").addEventListener("submit", event => {
+            event.preventDefault();
+            const formData = new FormData();
+            
+            const solarPanelId = document.querySelector("#sp-id").value;
+            const file = document.querySelector("#formFile");
+
+            formData.append("arquivo", file.files[0]);
+            formData.append("descricao", file.files[0].name);
+
+
+            let url = `http://localhost:8080/api/panels/${solarPanelId}/foto`;
+          
+            let options = {
+                method: 'PUT',
+                headers: {
+                    Authorization: authorizationData, 
+                },
+                body: formData
+            };
+
+            console.log(options);
+
+            fetch(url, options)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    panelImage.src = url;
+                    fecharModal.click();
+                })
+                .catch(err => console.error('error:' + err));
+        })
+    })
+
+
+    removerFoto.addEventListener("click", () => {
+        const options = {method: 'DELETE', headers: {Authorization: authorizationData}};
+        const solarPanelId = document.querySelector("#sp-id").value;
+
+        let url = `http://localhost:8080/api/panels/${solarPanelId}/foto`;
+
+        fetch(url, options)
+        .then(response => {
+            panelImage.src = url;
+            fecharModal.click();
+        })
+        .catch(err => console.error(err));
+    })
+
+</script>
+
+<script>
+    const editPanelForm = document.querySelector("#edit-panel-form");
+    editPanelForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const dataDiv = document.querySelector("#data-div");
+
+        const authorizationData = window.localStorage.getItem("Authorization");
+
+        const spId = document.querySelector("#sp-id").value;
+        const spBrand = document.querySelector("#sp-brand").value;
+        const spModel = document.querySelector("#sp-model").value;
+        const spMaxPower = document.querySelector("#sp-max-power").value;
+        const spEfficiency = document.querySelector("#sp-efficiency").value;
+        const spType = document.querySelector("#sp-panel-type").value;
+        const spPrice = document.querySelector("#sp-price").value;
+
+        const body = JSON.stringify({
+            model: spModel,
+            brand: spBrand,
+            maximumPower: spMaxPower,
+            efficiency: spEfficiency,
+            panelType: spType,
+            price: spPrice
+        })
+
+        let url = `http://localhost:8080/api/panels/${spId}`;
+
+        let options = {
+            method: 'PUT',
+            headers: {
+                Authorization: authorizationData, 
+                'Content-Type': 'application/json'
+            },
+            body: body
+        };
+
+        fetch(url, options)
+        .then(res => {
+            console.log(res);
+            return res.json();
+        })
+        .then(data => {
+            if (data.id) {
+                console.log(data);
+                dataDiv.innerHTML = `
+                        <h3>Painel Solar ${spBrand} ${spModel}</h3>
+                        <h5><span class="text-success">Potência máxima:</span> ${spMaxPower}W</h5>
+                        <h5><span class="text-success">Eficiência:</span> ${spEfficiency}%</h5>
+                        <h5><span class="text-success">Tipo:</span> ${spType}</h5>
+                        <div class="py-2">
+                            <h4><strong class="text-success">R$${spPrice}</strong></h4>
+                        </div>
+                    `;
+            } else {
+                console.log(data);
+            }
+        })
+        .catch(err => console.error('error:' + err));
+
+    })
+</script>
+
 <script>
     document.getElementById('form-panel-stats').addEventListener('submit', function(event) {
         event.preventDefault();

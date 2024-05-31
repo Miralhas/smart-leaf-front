@@ -57,6 +57,7 @@
 
         const authorizationData = window.localStorage.getItem("Authorization");
         const formData = new FormData();
+        let isWithImage = false;
 
         const spBrand = document.querySelector("#sp-brand").value;
         const spModel = document.querySelector("#sp-model").value;
@@ -66,17 +67,20 @@
         const spPrice = document.querySelector("#sp-price").value;
         const file = document.querySelector("#formFile");
 
-        const bodyData = JSON.stringify({
-            brand: spBrand,
-            model: spModel,
-            maximumPower: parseInt(spMaxPower),
-            efficiency: parseInt(spEfficiency),
-            panelType: spType,
-            price: parseFloat(spPrice)
-        });
+        if (file.files[0]) {
+            formData.append("arquivo", file.files[0]);
+            isWithImage = true;
+        }
 
+        const noImgBody = JSON.stringify({
+            model: spModel,
+            brand: spBrand,
+            maximumPower: spMaxPower,
+            efficiency: spEfficiency,
+            panelType: spType,
+            price: spPrice
+        })
     
-        formData.append("arquivo", file.files[0]);
         formData.append("model", spModel);
         formData.append("brand", spBrand);
         formData.append("maximumPower", parseInt(spMaxPower));
@@ -84,7 +88,8 @@
         formData.append("panelType", spType);
         formData.append("price", parseFloat(spPrice));
 
-        let url = 'http://localhost:8080/api/panels/with-image';
+        let url = 'http://localhost:8080/api';
+        url += isWithImage ? "/panels/with-image" : "/panels";
 
         let options = {
             method: 'POST',
@@ -94,7 +99,10 @@
             body: formData
         };
 
-        console.log(bodyData);
+        if (!isWithImage) {
+            options.headers["Content-Type"] = "application/json";
+            options.body = noImgBody;
+        }
 
         fetch(url, options)
         .then(res => {
