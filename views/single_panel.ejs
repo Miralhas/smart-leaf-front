@@ -150,7 +150,7 @@
                             <div class="form mb-3">
                                 <input type="hidden" value="<%= data.id %>" id="sp-id">
                                 <label for="formFile" class="form-label">Nova Imagem</label>
-                                <input class="form-control" type="file" id="formFile">
+                                <input class="form-control" type="file" id="formFile" accept="image/*">
                                 <button type="submit" class="btn btn-sm btn-success mt-3 px-5">Enviar</button>
                             </div>
                         </form>
@@ -226,7 +226,7 @@
         const editImageAnchor = document.createElement("a");
         editImageAnchor.setAttribute("data-bs-toggle", "modal");
         editImageAnchor.setAttribute("data-bs-target", "#editImage");
-        editImageAnchor.setAttribute("href", "#");
+        editImageAnchor.style.cursor = "pointer";
         deleteBtn.id = "edit-image-anchor";
 
         panelImage.parentNode.insertBefore(editImageAnchor, panelImage);
@@ -572,5 +572,4 @@
         });
     }
 </script>
-
 <%- include('partials/footer.ejs') %>
