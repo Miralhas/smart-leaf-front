@@ -1,17 +1,23 @@
 <%- include('partials/header.ejs') %>
 <div style="min-height: 100vh;">
-  <div class="container-fluid mx-auto d-flex justify-content-center my-5">
-    <form class="d-flex" action="/panels" method="get" id="panel-form">
-        <input class="form-control me-2 form-guess" style="width: 300px;" id="panelName" type="text" name="panelId" placeholder="Digite o nome de um painel..." required>
-        <button class="btn btn-success btn-guess" type="submit">Pesquisar</button>
-    </form>
+  <div class="container my-5">
+	<div class="row justify-content-center">
+		<div class="col-10 col-lg-5">
+			<div class="input-group">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1" style="height: 38px; border-radius: 0px;"><i class="fa-solid fa-search"></i></span>
+				</div>
+				<input class="form-control me-2 ps-2" id="panelName" type="text" placeholder="Digite o nome de um painel...">
+			</div>
+		</div>
+	</div>
   </div>
 
     <% if (locals.data) { %>
       <div id="all-seer">
-          <div class="row p-2 text-center" style="width: 100%;">
+          <div class="row p-2 text-center" id="panels-row" style="width: 100%;">
           <% data.forEach(panel => { %>
-            <div class="col-lg-4 mb-4 mt-3 d-flex justify-content-center">
+            <div class="panel-col col-lg-4 mb-4 mt-3 d-flex justify-content-center d-block">
               <div class="card mb-3">
                 <a href="/panels/<%= panel.id %>" style="color: white; text-decoration: none;">
                   <div class="mx-auto pt-3">
@@ -32,49 +38,23 @@
 </div>
 
 <script>
-  document.getElementById('panel-form').addEventListener('submit', function(event) {
-      event.preventDefault();
-      const panelName = document.getElementById('panelName').value;
-      const allSeer = document.getElementById("all-seer");
+	const panelInput = document.querySelector("#panelName");
 
-      const options = {method: 'GET', headers: {'Content-Type': 'application/json'}};
+	panelName.addEventListener("keyup", event => {
+		var panelsRow = document.querySelector("#panels-row");
+		var panelCols = panelsRow.getElementsByClassName("panel-col");
+		var filter = panelInput.value.toUpperCase();
+		var h3ModelName, textValue;
 
-      fetch(`http://localhost:8080/api/panels?name=${panelName}`, options)
-        .then(response => response.json())
-        .then(data => {
-          if (data.length) {
-            allSeer.innerHTML = "";
-            let rowDiv = document.createElement("div");
-            rowDiv.classList.add("row", "p-2", "text-center");
-            rowDiv.style.width = "100%";
-
-            data.map(panel => {
-              console.log(panel)
-              rowDiv.innerHTML += `
-                  <div class="col-lg-4 mb-4 mt-3 d-flex justify-content-center">
-                    <div class="card mb-3">
-                      <a href="/panels/${panel.id}" style="color: white; text-decoration: none;">
-                        <div class="mx-auto pt-3">
-                          <img src="http://localhost:8080/api/panels/${panel.id}/foto" alt="Painel" class="solar-panel-card-img card-img-top">
-                        </div>
-                        <div class="card-body border-bottom">
-                          <h3 class="card-title mt-2">${panel.model}</h3>
-                          <h4 class="card-text">${panel.brand}</h4>
-                          <a href="/panels/${panel.id}" name="panelId" id="panelId" class="btn btn-success btn-guess mt-3" type="submit">Visualizar</a>
-                        </div>
-                      </a>
-                    </div>
-                  </div>
-              `;
-            });
-
-            allSeer.append(rowDiv);
-          }
-        })
-        .catch(err => console.error(err));
-
-
-
-  });
+		for (let i = 0; i < panelCols.length; i++) {
+			h3ModelName = panelCols[i].getElementsByTagName("h3")[0];
+			textValue = h3ModelName.textContent || h3ModelName.innerText;
+			if (textValue.toUpperCase().indexOf(filter) > -1) {
+				panelCols[i].classList.replace("d-none", "d-block");
+			} else {
+				panelCols[i].classList.replace("d-block", "d-none");
+			}
+		}
+	})
 </script>
 <%- include('partials/footer.ejs') %>
